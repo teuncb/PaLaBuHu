@@ -25,3 +25,5 @@ def preprocess() -> (pd.DataFrame, pd.Series, pd.DataFrame, pd.Series, pd.DataFr
     X_train, y_train, test_size=0.2, random_state=42)
 
     return X_train, y_train, X_dev, y_dev, X_test, y_test
+
+X_train, y_train, X_dev, y_dev, X_test, y_test = preprocess()
