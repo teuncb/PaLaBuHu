@@ -1,5 +1,6 @@
 import argparse
 from time import time
+import numpy as np
 import torch
 import torch.nn as nn
 from typing import List
@@ -7,7 +8,14 @@ import torch.optim as optim
 from torch.utils.data import DataLoader
 from data_preprocessing import preprocess
 
-# Accuracies:
+# Define device, use CUDA when available:
+DEVICE = torch.device(
+    "cuda"
+    if torch.cuda.is_available()
+    else "mps"
+    if torch.backends.mps.is_available()
+    else "cpu"
+)
 
 # Data
 sequence_length = 1
@@ -49,7 +57,8 @@ class FFNN(nn.Module):
 # Training function
 def train_model(
         model: nn.Module,
-        train_loader: DataLoader,
+        train_set: np.ndarray,
+        labels: np.ndarray,
         loss_fn: nn.Module,
         optimizer: optim.Adam,
         num_epochs: int,
@@ -59,11 +68,11 @@ def train_model(
     print(f"Training Started:")
 
     model.to(device)
-    batch_size = len(train_loader)
+    batch_size = len(train_set)
     train_losses = []
     for epoch in range(num_epochs):
         model.train()
-        for i, (X, y) in enumerate(train_loader):
+        for i, (X, y) in enumerate((train_set, labels)):
             X = X.float().to(device)
             y = y.long().to(device)
             preds = model(X)
@@ -110,27 +119,44 @@ def test_model(test_set, model, loss_fn, device):
 
 def main():
     # retrieve data
-    X_train, y_train, X_dev, y_dev, X_test, y_test = preprocess()
+    X_train, X_p_train, y_train,X_dev ,X_p_dev, y_dev, X_test,X_p_test, y_test = preprocess()
+
+    # add protected attribute  
+    X_p_train = X_p_train.reshape(-1,1)
+    X_train = np.concatenate((X_train,X_p_train), axis=1)
+
+    X_p_dev = X_p_dev.reshape(-1,1)
+    X_dev = np.concatenate((X_dev,X_p_dev), axis=1)
+
+    X_p_test = X_p_test.reshape(-1,1)
+    X_test = np.concatenate((X_test,X_p_test), axis=1)
+
+    # convert to Torch Tensor
+    # X_train = torch.from_numpy(X_train)
+    # X_dev = torch.from_numpy(X_dev)
+    # X_test = torch.from_numpy(X_test)
+
     model = FFNN(
-        input_size=FEATURE_SIZE,
+        input_size=len(X_train),
         hidden_size=64,
-        num_classes=CLASS_SIZE,
+        num_classes=2,
     )
     optimizer = optimizer_function(model.parameters(), lr=learning_rate, weight_decay=0.01)
 
     train_model(
         model,
-        X_test,
+        X_train,
+        y_train,
         loss_function,
         optimizer,
         num_epochs=num_epochs,
         device=DEVICE,
     )
     # save model
-    torch.save(model, f"checkpoints/{args.train_set}_model.pth")
+    torch.save(model, f"checkpoints/model.pth")
 
     # test model
-    test_model(test_dataloader, model, loss_function, DEVICE)
+    test_model(X_test, model, loss_function, DEVICE)
 
     # do the same without protected attribute
     # and for predicting protected attribute
