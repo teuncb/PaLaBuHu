@@ -233,3 +233,4 @@ fabric.properties
 # CUSTOM
 .idea\PaLaBuHu.iml
 .idea\misc.xml
+*.csv
