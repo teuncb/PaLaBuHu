@@ -5,6 +5,9 @@ from sklearn.metrics import accuracy_score
 import numpy as np
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import GridSearchCV
+import shap
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
 from data_preprocessing import X_train, y_train, X_dev, y_dev, X_test, y_test
 
 def evaluate(model, x, y):
@@ -12,20 +15,32 @@ def evaluate(model, x, y):
     return accuracy_score(y, y_pred)
 
 '''Step 1: Training and evaluating the first iteration of GAM to tune the hyperparameters'''
-def GAM(X_train, y_train, X_dev, y_dev, X_test, y_test):
+def GAM(X_train, y_train, X_dev, y_dev):
     # Use linear term for continuous variables (spline terms can also be used if non-linear relationships are expected)
     # Use factor terms for categorical variables
     # Use te() for interactions between variables
     # LogiticGAM assumes binomial distribution with logit link function
-    #terms= l() + s() + f()
-    base_gam = LogisticGAM()
+
+    base_gam = LogisticGAM(    
+    s(0) +       # AGEP (Age) - spline term for continuous variable
+    f(1) +       # COW (Class of Worker) - factor term for categorical variable
+    f(2) +       # SCHL (Educational Attainment) - factor term for categorical variable
+    f(3) +       # MAR (Marital Status) - factor term for categorical variable
+    f(4) +       # OCCP (Occupation) - factor term for categorical variable
+    f(5) +       # POBP (Place of Birth) - factor term for categorical variable
+    f(6) +       # RELP (Relationship) - factor term for categorical variable
+    s(7) +       # WKHP (Working Hours per Week) - spline term for continuous variable
+    f(8) +       # SEX (Sex) - factor term for categorical variable
+    f(9)         # RAC1P (Race) - factor term for categorical variable))
+    )
+
     base_gam_trained = LogisticGAM().fit(X_train, y_train)
     base_acc = evaluate(base_gam_trained, X_dev, y_dev)
 
     # Uitzoeken: wat kunnen/willen we allemaal tunen? nu random waardes hier
     param_grid = {
-        'lam': np.logspace(-3, 3, 7),
-        'n_splines': [30, 40, 50]      
+        'n_splines': [10, 20, 30, 40, 50],
+        'lam': [0.1, 0.5, 1.0]  
     }
 
     # Find best parameters and model
@@ -42,31 +57,41 @@ def GAM(X_train, y_train, X_dev, y_dev, X_test, y_test):
     print(f'First Accuracy GAM: {base_acc}, Tuned Accuracy GAM: {tuned_acc}')
     return best_regr
 
-def logreg(X_train, y_train, X_dev, y_dev, X_test, y_test):
-    base_log = LogisticRegression()
-    base_log_trained = LogisticRegression().fit(X_train, y_train)
-    base_acc = evaluate(base_log_trained, X_dev, y_dev)
+def logreg(X_train, y_train, X_dev, y_dev):
 
-    # Uitzoeken: wat kunnen/willen we allemaal tunen? nu random waardes hier
-    param_grid = {
-            
-    }
+    pipeline = Pipeline([
+    ('scaler', StandardScaler()),
+    ('logreg', LogisticRegression(max_iter=10000))  # Increase max_iter
+])
+    base_log_trained = pipeline.fit(X_train, y_train)
+    logreg_model = base_log_trained.named_steps['logreg']
+    
+    return logreg_model
 
-    # Find best parameters and model
-    grid_search = GridSearchCV(estimator=base_log, param_grid=param_grid, scoring='accuracy') #nog aanvullen evt
-    grid_search.fit(X_train, y_train)
+# Results to compare
+#GAM_trained = GAM(X_train, y_train, X_dev, y_dev)
+LOG_trained = logreg(X_train, y_train, X_dev, y_dev)
 
-    best_params = grid_search.best_params_
-    best_regr = LogisticRegression(**best_params)
+#GAM_summary = GAM_trained.summary()
+LOG_summary = LOG_trained.coef_
 
-    best_regr.fit(X_train, y_train)
+#GAM_tested = evaluate(GAM_trained, X_test, y_test)
+LOG_tested = evaluate(LOG_trained, X_test, y_test)
+print(LOG_tested)
 
-    # Predict again on development set and get RMSE
-    tuned_acc = evaluate(best_regr, X_dev, y_dev)
-    print(f'First Accuracy LogReg: {base_acc}, Tuned Accuracy LogReg: {tuned_acc}')
+'''Step 3: SHAP'''
+def shap_explainer(model, X_train, X_test):
+    # we use a subset to save computation time
+    explainer = shap.KernelExplainer(model.predict, X_train[:100])
 
-    return best_regr
-# Take best model and predict on test values and report RMSE
-# TODO
+    # Calculate SHAP values for the test set
+    shap_values = explainer.shap_values(X_test)
 
-'''Step 3: PFI'''
+    # Visualize the SHAP values for a single prediction
+    shap.initjs()
+    shap.force_plot(explainer.expected_value[1], shap_values[1][0], X_test.iloc[0])
+
+    # Summary plot for feature importance
+    shap.summary_plot(shap_values[1], X_test)
+
+# shap_explainer(GAM_trained, X_train, X_test)
