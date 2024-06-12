@@ -22,10 +22,10 @@ sequence_length = 1
 shuffle = True
 
 # Training
-num_epochs = 2
+num_epochs = 10
 batch_size = 500
-learning_rate = 0.001
-loss_function = nn.CrossEntropyLoss()
+learning_rate = 0.01
+loss_function = nn.BCEWithLogitsLoss()
 optimizer_function = torch.optim.Adam
 
 
@@ -72,13 +72,16 @@ def train_model(
     train_losses = []
     for epoch in range(num_epochs):
         model.train()
-        for i, (X, y) in enumerate((train_set, labels)):
+        for i, (X, y) in enumerate(zip(train_set, labels)):
             X = X.float().to(device)
-            y = y.long().to(device)
-            preds = model(X)
+            y = y.float().to(device)
+            preds = model(X).squeeze()
             #print(X.shape)
-            #print(y.shape, preds.shape)
-            preds = preds.squeeze(1)
+            # print(y.shape)
+            # print(y)
+            # print(preds.shape)
+            # print(preds)
+            #preds = preds.unsqueeze(1)
             loss = loss_fn(preds, y)
             train_losses.append(loss.item())
 
@@ -95,21 +98,21 @@ def train_model(
     return train_losses
 
 
-def test_model(test_set, model, loss_fn, device):
+def test_model(test_set, test_label, model, loss_fn, device):
     model.eval()
     size = len(test_set)
     num_batches = len(test_set)
     test_loss, correct = 0, 0
 
     with torch.no_grad():
-        for i, (X, y) in enumerate(test_set):
+        for i, (X, y) in enumerate(zip(test_set, test_label)):
             X = X.float().to(device)
-            y = y.long().to(device)
+            y = y.float().to(device)
 
-            pred = model(X)
-            pred = pred.squeeze(1)
+            pred = model(X).squeeze()
+            #pred = pred.squeeze(1)
             test_loss += loss_fn(pred, y).item()
-            correct += (pred.argmax(1) == y).type(torch.float).sum().item()
+            correct += (pred.argmax(0) == y).type(torch.float).sum().item()
 
     test_loss /= num_batches
     accuracy = correct / size
@@ -118,8 +121,8 @@ def test_model(test_set, model, loss_fn, device):
 
 
 def main():
-    # retrieve data
-    X_train, X_p_train, y_train,X_dev ,X_p_dev, y_dev, X_test,X_p_test, y_test = preprocess()
+    #retrieve data
+    X_train, X_p_train, y_train,X_dev ,X_p_dev, y_dev, X_test,X_p_test, y_test, _ = preprocess()
 
     # add protected attribute  
     X_p_train = X_p_train.reshape(-1,1)
@@ -132,14 +135,18 @@ def main():
     X_test = np.concatenate((X_test,X_p_test), axis=1)
 
     # convert to Torch Tensor
-    # X_train = torch.from_numpy(X_train)
-    # X_dev = torch.from_numpy(X_dev)
-    # X_test = torch.from_numpy(X_test)
-
+    X_train = torch.from_numpy(X_train)
+    X_dev = torch.from_numpy(X_dev)
+    X_test = torch.from_numpy(X_test)
+    y_train = torch.from_numpy(y_train)
+    y_dev = torch.from_numpy(y_dev)
+    y_test = torch.from_numpy(y_test)
+    
+    # define and train model
     model = FFNN(
-        input_size=len(X_train),
+        input_size=X_train.shape[1],
         hidden_size=64,
-        num_classes=2,
+        num_classes=1,
     )
     optimizer = optimizer_function(model.parameters(), lr=learning_rate, weight_decay=0.01)
 
@@ -152,13 +159,18 @@ def main():
         num_epochs=num_epochs,
         device=DEVICE,
     )
+
     # save model
-    torch.save(model, f"checkpoints/model.pth")
+    torch.save(model, "checkpoints/simpleNNmodel.pth")
+
+    # load model
+    model = torch.load("checkpoints/simpleNNmodel.pth")
 
     # test model
-    test_model(X_test, model, loss_function, DEVICE)
+    test_model(X_test, y_test, model, loss_function, DEVICE)
 
     # do the same without protected attribute
+
     # and for predicting protected attribute
 
 
