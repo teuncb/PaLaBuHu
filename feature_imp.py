@@ -8,7 +8,7 @@ from sklearn.model_selection import GridSearchCV
 import shap
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
-from data_preprocessing import X_train, y_train, X_dev, y_dev, X_test, y_test
+from data_preprocessing import X_train, X_p_train, y_train,X_dev ,X_p_dev, y_dev, X_test,X_p_test, y_test
 
 def evaluate(model, x, y):
     y_pred = model.predict(x)
@@ -22,7 +22,7 @@ def GAM(X_train, y_train, X_dev, y_dev):
     # LogiticGAM assumes binomial distribution with logit link function
 
     base_gam = LogisticGAM(    
-    s(0) +       # AGEP (Age) - spline term for continuous variable
+    l(0) +       # AGEP (Age) - linear term for continuous variable
     f(1) +       # COW (Class of Worker) - factor term for categorical variable
     f(2) +       # SCHL (Educational Attainment) - factor term for categorical variable
     f(3) +       # MAR (Marital Status) - factor term for categorical variable
@@ -39,8 +39,8 @@ def GAM(X_train, y_train, X_dev, y_dev):
 
     # Uitzoeken: wat kunnen/willen we allemaal tunen? nu random waardes hier
     param_grid = {
-        'n_splines': [10, 20, 30, 40, 50],
-        'lam': [0.1, 0.5, 1.0]  
+        'n_splines': [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 60, 70, 80],
+        
     }
 
     # Find best parameters and model
@@ -48,16 +48,16 @@ def GAM(X_train, y_train, X_dev, y_dev):
     grid_search.fit(X_train, y_train)
 
     best_params = grid_search.best_params_
-    best_regr = LogisticGAM(lam=best_params['lam'], n_splines=best_params['n_splines'])
+    best_regr = LogisticGAM(n_splines=best_params['n_splines'])
 
-    best_regr.fit(X_train, y_train)
+    best_regr_trained = best_regr.fit(X_train, y_train)
 
     # Predict again on development set and get RMSE
     tuned_acc = evaluate(best_regr, X_dev, y_dev)
     print(f'First Accuracy GAM: {base_acc}, Tuned Accuracy GAM: {tuned_acc}')
-    return best_regr
+    return best_regr_trained
 
-def logreg(X_train, y_train, X_dev, y_dev):
+# def logreg(X_train, y_train, X_dev, y_dev):
 
     pipeline = Pipeline([
     ('scaler', StandardScaler()),
@@ -69,15 +69,14 @@ def logreg(X_train, y_train, X_dev, y_dev):
     return logreg_model
 
 # Results to compare
-#GAM_trained = GAM(X_train, y_train, X_dev, y_dev)
-LOG_trained = logreg(X_train, y_train, X_dev, y_dev)
+GAM_trained = GAM(X_train, y_train, X_dev, y_dev)
+#LOG_trained = logreg(X_train, y_train, X_dev, y_dev)
 
-#GAM_summary = GAM_trained.summary()
-LOG_summary = LOG_trained.coef_
+GAM_summary = GAM_trained.summary()
+#LOG_summary = LOG_trained.coef_
 
-#GAM_tested = evaluate(GAM_trained, X_test, y_test)
-LOG_tested = evaluate(LOG_trained, X_test, y_test)
-print(LOG_tested)
+GAM_tested = evaluate(GAM_trained, X_test, y_test)
+#LOG_tested = evaluate(LOG_trained, X_test, y_test)
 
 '''Step 3: SHAP'''
 def shap_explainer(model, X_train, X_test):
