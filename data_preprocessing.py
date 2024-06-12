@@ -10,6 +10,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
+from category_encoders import OrdinalEncoder
 
 def preprocess():
     """Return X_train, X_p_train, y_train,X_dev ,X_p_dev, y_dev, X_test,X_p_test, y_test, feature_names"""
@@ -30,9 +31,28 @@ def preprocess():
     # feature names in order
     feature_names=["AGEP", "COW", "SCHL", "MAR", "OCCP", "POBP", "RELP", "WKHP", "SEX", "RAC1P"]
 
-    X_train, X_test, y_train, y_test = train_test_split(
-    features, label, test_size=0.2, random_state=42)
+    # Create a DataFrame with features and target
+    df_features = pd.DataFrame(features, columns=feature_names)
 
+    # One-hot encode categorical variables
+    categorical_vars = ["COW", "SCHL", "MAR", "OCCP", "POBP", "RELP", "SEX", "RAC1P"]
+    high_cardinality_vars = ["SCHL", "OCCP", "POBP"]
+    low_cardinality_vars = ["COW", "SCHL", "MAR", "RELP", "SEX", "RAC1P"]
+    # Ordinal encoding for high cardinality variables
+    encoder = OrdinalEncoder(cols=high_cardinality_vars)
+    df_features[high_cardinality_vars] = encoder.fit_transform(df_features[high_cardinality_vars])
+
+    # One-hot encoding for low cardinality variables
+    df_encoded = pd.get_dummies(df_features, columns=low_cardinality_vars, drop_first=True)
+
+    # Convert the encoded DataFrame back to a NumPy array
+    encoded_features = df_encoded.values
+
+# Convert the encoded DataFrame back to a NumPy array
+    encoded_features = df_encoded.values
+    X_train, X_test, y_train, y_test = train_test_split(
+    encoded_features, label, test_size=0.2, random_state=42)
+    
     # split up training set in train and dev sets
     X_train, X_dev, y_train, y_dev = train_test_split(
     X_train, y_train, test_size=0.2, random_state=42)
@@ -46,6 +66,6 @@ def preprocess():
     X_test = np.delete(X_test,8,1)
     X_dev = np.delete(X_dev,8,1)
        
-    return X_train, X_p_train, y_train,X_dev ,X_p_dev, y_dev, X_test,X_p_test, y_test, feature_names
+    return X_train, X_p_train, y_train,X_dev ,X_p_dev, y_dev, X_test,X_p_test, y_test
 
-#X_train, X_p_train, y_train,X_dev ,X_p_dev, y_dev, X_test,X_p_test, y_test = preprocess()
+X_train, X_p_train, y_train,X_dev ,X_p_dev, y_dev, X_test,X_p_test, y_test = preprocess()
