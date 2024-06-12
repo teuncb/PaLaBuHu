@@ -39,8 +39,8 @@ def GAM(X_train, y_train, X_dev, y_dev):
 
     # Uitzoeken: wat kunnen/willen we allemaal tunen? nu random waardes hier
     param_grid = {
-        'n_splines': [10, 20, 30, 40, 50],
-        'lam': [0.1, 0.5, 1.0]  
+        'n_splines': [50, 70, 90, 100, 120, 150, 200, 250],
+        'lam': [0.1, 0.2, 0.3, 0.4, 0.5, 1.0]  
     }
 
     # Find best parameters and model
@@ -57,7 +57,7 @@ def GAM(X_train, y_train, X_dev, y_dev):
     print(f'First Accuracy GAM: {base_acc}, Tuned Accuracy GAM: {tuned_acc}')
     return best_regr
 
-def logreg(X_train, y_train, X_dev, y_dev):
+# def logreg(X_train, y_train, X_dev, y_dev):
 
     pipeline = Pipeline([
     ('scaler', StandardScaler()),
@@ -69,15 +69,14 @@ def logreg(X_train, y_train, X_dev, y_dev):
     return logreg_model
 
 # Results to compare
-#GAM_trained = GAM(X_train, y_train, X_dev, y_dev)
-LOG_trained = logreg(X_train, y_train, X_dev, y_dev)
+GAM_trained = GAM(X_train, y_train, X_dev, y_dev)
+#LOG_trained = logreg(X_train, y_train, X_dev, y_dev)
 
-#GAM_summary = GAM_trained.summary()
-LOG_summary = LOG_trained.coef_
+GAM_summary = GAM_trained.summary()
+#LOG_summary = LOG_trained.coef_
 
-#GAM_tested = evaluate(GAM_trained, X_test, y_test)
-LOG_tested = evaluate(LOG_trained, X_test, y_test)
-print(LOG_tested)
+GAM_tested = evaluate(GAM_trained, X_test, y_test)
+#LOG_tested = evaluate(LOG_trained, X_test, y_test)
 
 '''Step 3: SHAP'''
 def shap_explainer(model, X_train, X_test):
