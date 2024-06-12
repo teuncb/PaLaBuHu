@@ -34,28 +34,17 @@ def GAM(X_train, y_train, X_dev, y_dev):
     f(9)         # RAC1P (Race) - factor term for categorical variable))
     )
 
-    base_gam_trained = LogisticGAM().fit(X_train, y_train)
+    base_gam_trained = base_gam.fit(X_train, y_train)
     base_acc = evaluate(base_gam_trained, X_dev, y_dev)
 
     # Uitzoeken: wat kunnen/willen we allemaal tunen? nu random waardes hier
-    param_grid = {
-        'n_splines': [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 60, 70, 80],
-        
-    }
+    lams = np.random.rand(10, 10) # random points on [0, 1], with shape (100, 3)
+    lams = lams * 6 - 3 # shift values to -3, 3
+    lams = 10 ** lams # transforms values to 1e-3, 1e3
 
-    # Find best parameters and model
-    grid_search = GridSearchCV(estimator=base_gam, param_grid=param_grid, scoring='accuracy') #nog aanvullen evt
-    grid_search.fit(X_train, y_train)
+    tuned_gam = base_gam.gridsearch(X_train, y_train, lam=lams)
 
-    best_params = grid_search.best_params_
-    best_regr = LogisticGAM(n_splines=best_params['n_splines'])
-
-    best_regr_trained = best_regr.fit(X_train, y_train)
-
-    # Predict again on development set and get RMSE
-    tuned_acc = evaluate(best_regr, X_dev, y_dev)
-    print(f'First Accuracy GAM: {base_acc}, Tuned Accuracy GAM: {tuned_acc}')
-    return best_regr_trained
+    return tuned_gam
 
 # def logreg(X_train, y_train, X_dev, y_dev):
 
@@ -94,3 +83,16 @@ def shap_explainer(model, X_train, X_test):
     shap.summary_plot(shap_values[1], X_test)
 
 # shap_explainer(GAM_trained, X_train, X_test)
+
+"""    # Find best parameters and model
+    grid_search = GridSearchCV(estimator=base_gam, param_grid=param_grid, scoring='accuracy', cv=3) #nog aanvullen evt
+    grid_search.fit(X_train, y_train)
+
+    best_params = grid_search.best_params_
+    best_regr = LogisticGAM(**best_params)
+
+    best_regr_trained = best_regr.fit(X_train, y_train)
+
+    # Predict again on development set and get RMSE
+    tuned_acc = evaluate(best_regr, X_dev, y_dev)
+    print(f'First Accuracy GAM: {base_acc}, Tuned Accuracy GAM: {tuned_acc}')"""
