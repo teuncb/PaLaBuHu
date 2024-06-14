@@ -1,11 +1,9 @@
-import argparse
 from time import time
 import numpy as np
 import torch
 import torch.nn as nn
 from typing import List
 import torch.optim as optim
-from torch.utils.data import DataLoader
 from data_preprocessing import preprocess
 
 # Define device, use CUDA when available:
