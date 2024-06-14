@@ -47,6 +47,6 @@ def preprocess():
     #X_test = np.delete(X_test,8,1)
     #X_dev = np.delete(X_dev,8,1)
        
-    return X_train, X_p_train, y_train,X_dev ,X_p_dev, y_dev, X_test,X_p_test, y_test
+    return X_train, X_p_train, y_train, X_dev, X_p_dev, y_dev, X_test, X_p_test, y_test, feature_names
 
-X_train, X_p_train, y_train,X_dev ,X_p_dev, y_dev, X_test,X_p_test, y_test = preprocess()
+#X_train, X_p_train, y_train,X_dev ,X_p_dev, y_dev, X_test,X_p_test, y_test = preprocess()
