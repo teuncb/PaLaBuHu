@@ -26,7 +26,26 @@ learning_rate = 0.01
 loss_function = nn.BCEWithLogitsLoss()
 optimizer_function = torch.optim.Adam
 
+def initialize(X_train, X_p_train, y_train,X_dev ,X_p_dev, y_dev, X_test,X_p_test, y_test, _):
 
+    # add protected attribute  
+    # X_p_train = X_p_train.reshape(-1,1)
+    # X_train = np.concatenate((X_train,X_p_train), axis=1)
+
+    # X_p_dev = X_p_dev.reshape(-1,1)
+    # X_dev = np.concatenate((X_dev,X_p_dev), axis=1)
+
+    # X_p_test = X_p_test.reshape(-1,1)
+    # X_test = np.concatenate((X_test,X_p_test), axis=1)
+
+    # convert to Torch Tensor
+    X_train = torch.from_numpy(X_train)
+    X_dev = torch.from_numpy(X_dev)
+    X_test = torch.from_numpy(X_test)
+    y_train = torch.from_numpy(y_train)
+    y_dev = torch.from_numpy(y_dev)
+    y_test = torch.from_numpy(y_test)
+    
 # Define Neural Network
 class FFNN(nn.Module):
     def __init__(self, input_size, hidden_size, num_classes):#, dropout_rate=0.3):
@@ -118,48 +137,32 @@ def test_model(test_set, test_label, model, loss_fn, device):
     print(f"Test Error: \n Accuracy: {accuracy:>0.1f}%, Avg loss: {test_loss:>8f} \n")
 
 
+
 def main():
     #retrieve data
-    X_train, X_p_train, y_train,X_dev ,X_p_dev, y_dev, X_test,X_p_test, y_test, _ = preprocess()
-
-    # add protected attribute  
-    X_p_train = X_p_train.reshape(-1,1)
-    X_train = np.concatenate((X_train,X_p_train), axis=1)
-
-    X_p_dev = X_p_dev.reshape(-1,1)
-    X_dev = np.concatenate((X_dev,X_p_dev), axis=1)
-
-    X_p_test = X_p_test.reshape(-1,1)
-    X_test = np.concatenate((X_test,X_p_test), axis=1)
-
-    # convert to Torch Tensor
-    X_train = torch.from_numpy(X_train)
-    X_dev = torch.from_numpy(X_dev)
-    X_test = torch.from_numpy(X_test)
-    y_train = torch.from_numpy(y_train)
-    y_dev = torch.from_numpy(y_dev)
-    y_test = torch.from_numpy(y_test)
     
-    # define and train model
-    model = FFNN(
-        input_size=X_train.shape[1],
-        hidden_size=64,
-        num_classes=1,
-    )
-    optimizer = optimizer_function(model.parameters(), lr=learning_rate, weight_decay=0.01)
+    # X_train, X_p_train, y_train, X_dev, X_p_dev, y_dev, X_test, X_p_test, y_test, _ = preprocess()  
+    # initialize(X_train, X_p_train, y_train, X_dev, X_p_dev, y_dev, X_test, X_p_test, y_test, _)
+    # # define and train model
+    # model = FFNN(
+    #     input_size=X_train.shape[1],
+    #     hidden_size=64,
+    #     num_classes=1,
+    # )
+    # optimizer = optimizer_function(model.parameters(), lr=learning_rate, weight_decay=0.01)
 
-    train_model(
-        model,
-        X_train,
-        y_train,
-        loss_function,
-        optimizer,
-        num_epochs=num_epochs,
-        device=DEVICE,
-    )
+    # train_model(
+    #     model,
+    #     X_train,
+    #     y_train,
+    #     loss_function,
+    #     optimizer,
+    #     num_epochs=num_epochs,
+    #     device=DEVICE,
+    # )
 
-    # save model
-    torch.save(model, "checkpoints/simpleNNmodel.pth")
+    # # save model
+    # torch.save(model, "checkpoints/simpleNNmodel.pth")
 
     # load model
     model = torch.load("checkpoints/simpleNNmodel.pth")
