@@ -30,6 +30,20 @@ def preprocess():
     # feature names in order
     feature_names=["AGEP", "COW", "SCHL", "MAR", "OCCP", "POBP", "RELP", "WKHP", "SEX", "RAC1P"]
 
+    if syn == True:
+        male_condition = features[:, 8] == 1
+        # nieuwe column aanmaken
+        promo_prob = np.zeros(features.shape[0])
+        # number of male cells 
+        num_male_cells = np.sum(male_condition)
+        num_ones = int(0.95* num_male_cells)
+        num_zeros = num_male_cells - num_ones
+        ones_and_zeros = np.array([1]*num_ones + [0]*num_zeros)
+        np.random.shuffle(ones_and_zeros)
+        # 95% van de mannen krijgen een promotie probability van 1, alle vrouwen krijgen een promotie prob van 0
+        promo_prob[male_condition] = ones_and_zeros
+        features = np.column_stack((features, promo_prob))
+
     X_train, X_test, y_train, y_test = train_test_split(
     features, label, test_size=0.2, random_state=42)
     
@@ -43,9 +57,9 @@ def preprocess():
     X_p_test = X_test[:,8]
     
     # remove protected attribute from train and test set
-    #X_train = np.delete(X_train,8,1)
-    #X_test = np.delete(X_test,8,1)
-    #X_dev = np.delete(X_dev,8,1)
+    X_train = np.delete(X_train,8,1)
+    X_test = np.delete(X_test,8,1)
+    X_dev = np.delete(X_dev,8,1)
        
     return X_train, X_p_train, y_train, X_dev, X_p_dev, y_dev, X_test, X_p_test, y_test, feature_names
 
