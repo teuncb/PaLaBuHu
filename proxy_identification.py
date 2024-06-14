@@ -3,15 +3,19 @@ import pandas as pd
 #from sklearn import
 
 from data_preprocessing import preprocess
-from feature_imp import GAM, logreg
+from classifiers import GAM, logreg
+# from nn import train_nn
+from feature_imp import shap_explainer
 
 def model(X_train, y_train, X_dev, y_dev, X_test, y_test, model_type="logreg"):
     """Return a model object for determining y based on X"""
     match model_type:
         case 'GAM':
-            trained_model = GAM(X_train, y_train, X_dev, y_dev, X_test, y_test)
+            trained_model = GAM(X_train, y_train, X_dev, y_dev)
         case 'logreg':
-            trained_model = logreg(X_train, y_train, X_dev, y_dev, X_test, y_test)
+            trained_model = logreg(X_train, y_train, X_dev, y_dev)
+        # case 'nn':
+        #     trained_model = train_nn(X_train, y_train, X_dev, y_dev)
         case _:
             raise Exception(f'Model type "{model_type}" not recognised.')
 
@@ -28,22 +32,32 @@ def palabuhu_values(importance_with_xp, importance_without_xp, importance_predic
     # TODO Arbitrary placeholder, we need to check how these features look to decide on this operation
     return abs(importance_with_xp - importance_without_xp) * importance_predicting_xp
 
-if __name__ == '__main__': # TODO update after vector with protected attribute returned from preprocessing
-    X_train, y_train, X_dev, y_dev, X_test, y_test = preprocess()
-    protected_attribute = 'sex' # TODO placeholder
+if __name__ == '__main__':
+    (X_train_without_p, xp_train, y_train,
+     X_dev_without_p, xp_dev, y_dev,
+     X_test_without_p, xp_test, y_test,
+     feature_names) = preprocess()
 
-    model_with_xp = model(X_train, y_train, model_type='GAM')
+    # Generate X sets with protected attribute
+    xp_train = xp_train.reshape(-1, 1)
+    X_train_with_p = np.concatenate((X_train_without_p, xp_train), axis=1)
+    xp_dev = xp_dev.reshape(-1, 1)
+    X_dev_with_p = np.concatenate((X_dev_without_p, xp_dev), axis=1)
+    xp_test = xp_test.reshape(-1, 1)
+    X_test_with_p = np.concatenate((X_test_without_p, xp_test), axis=1)
+
+    model_with_xp = model(X_train_with_p, y_train, X_dev_with_p, y_dev, X_test_with_p, y_test, model_type='logreg')
     importance_with_xp = get_feature_importance(model_with_xp)
+    print(f"importance_with_xp: {importance_with_xp}")
 
-    # Slice xp out of the features
-    X_train_without_xp = np.ones(len(X_train)) # TODO placeholder
-    model_without_xp = model(X_train_without_xp, y_train)
+    model_without_xp = model(X_train_without_p, y_train, X_dev_without_p, y_dev, X_test_without_p, y_test, model_type='logreg')
     importance_without_xp = get_feature_importance(model_without_xp)
+    print(f"importance_without_xp: {importance_without_xp}")
 
     # Use xp as target variable
-    model_predicting_xp = model(X_train_without_xp, X_train[protected_attribute])
+    model_predicting_xp = model(X_train_without_p, xp_train, X_dev_without_p, xp_dev, X_test_without_p, xp_test, model_type='logreg')
     importance_predicting_xp = get_feature_importance(model_predicting_xp)
+    print(f"importance_predicting_xp: {importance_predicting_xp}")
 
     proxyness_per_feature = palabuhu_values(importance_with_xp, importance_without_xp, importance_predicting_xp)
-
-    print(proxyness_per_feature)
+    print(f"proxyness_per_feature: {proxyness_per_feature}")
