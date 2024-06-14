@@ -57,16 +57,6 @@ def GAM(X_train, y_train, X_dev, y_dev):
     
     return logreg_model
 
-# Results to compare
-GAM_trained = GAM(X_train, y_train, X_dev, y_dev)
-#LOG_trained = logreg(X_train, y_train, X_dev, y_dev)
-
-GAM_summary = GAM_trained.summary()
-#LOG_summary = LOG_trained.coef_
-
-GAM_tested = evaluate(GAM_trained, X_test, y_test)
-#LOG_tested = evaluate(LOG_trained, X_test, y_test)
-
 '''Step 3: SHAP'''
 def shap_explainer(model, X_train, X_test):
     # we use a subset to save computation time
@@ -82,6 +72,8 @@ def shap_explainer(model, X_train, X_test):
     # Summary plot for feature importance
     shap.summary_plot(shap_values[1], X_test)
 
+    return shap_values
+
 # shap_explainer(GAM_trained, X_train, X_test)
 
 """    # Find best parameters and model
@@ -96,3 +88,14 @@ def shap_explainer(model, X_train, X_test):
     # Predict again on development set and get RMSE
     tuned_acc = evaluate(best_regr, X_dev, y_dev)
     print(f'First Accuracy GAM: {base_acc}, Tuned Accuracy GAM: {tuned_acc}')"""
+
+if __name__ == '__main__':
+    # Results to compare
+    GAM_trained = GAM(X_train, y_train, X_dev, y_dev)
+    # LOG_trained = logreg(X_train, y_train, X_dev, y_dev)
+
+    GAM_summary = GAM_trained.summary()
+    # LOG_summary = LOG_trained.coef_
+
+    GAM_tested = evaluate(GAM_trained, X_test, y_test)
+    # LOG_tested = evaluate(LOG_trained, X_test, y_test)
