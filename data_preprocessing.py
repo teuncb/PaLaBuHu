@@ -11,7 +11,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 
-def preprocess():
+def preprocess(add_synthetic_data=False):
     """Return X_train, X_p_train, y_train, X_dev, X_p_dev, y_dev, X_test, X_p_test, y_test, feature_names"""
 
     # view processed data: generate csv for CA
@@ -30,7 +30,7 @@ def preprocess():
     # feature names in order
     feature_names=["AGEP", "COW", "SCHL", "MAR", "OCCP", "POBP", "RELP", "WKHP", "SEX", "RAC1P"]
 
-    if syn == True:
+    if add_synthetic_data == True:
         male_condition = features[:, 8] == 1
         # nieuwe column aanmaken
         promo_prob = np.zeros(features.shape[0])
