@@ -11,8 +11,8 @@ from sklearn.model_selection import train_test_split
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 
-def preprocess(syn):
-    """Return X_train, X_p_train, y_train,X_dev ,X_p_dev, y_dev, X_test,X_p_test, y_test, feature_names"""
+def preprocess():
+    """Return X_train, X_p_train, y_train, X_dev, X_p_dev, y_dev, X_test, X_p_test, y_test, feature_names"""
 
     # view processed data: generate csv for CA
     # data_source = ACSDataSource(survey_year='2018', horizon='1-Year', survey='person')
