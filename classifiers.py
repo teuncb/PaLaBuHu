@@ -49,8 +49,9 @@ def logreg(X_train, y_train, X_dev, y_dev):
     ('scaler', StandardScaler()),
     ('logreg', LogisticRegression(max_iter=10000))  # Increase max_iter
 ])
-    base_log_trained = pipeline.fit(X_train, y_train)
-    logreg_model = base_log_trained.named_steps['logreg']
+    #base_log_trained = pipeline.fit(X_train, y_train)
+    logreg_model = pipeline.fit(X_train, y_train)
+    #logreg_model = base_log_trained.named_steps['logreg']
 
     return logreg_model
 
