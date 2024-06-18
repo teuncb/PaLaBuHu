@@ -28,7 +28,7 @@ def shap_explainer(model, X_train, X_test):
     #shap.force_plot(explainer.expected_value, shap_values[1], X_test.iloc[0])
 
     # Summary plot for feature importance
-    shap.summary_plot(shap_values[1], X_test)
+    shap.summary_plot(shap_values, X_test)
 
     return shap_values
 
