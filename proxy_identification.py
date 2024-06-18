@@ -47,7 +47,7 @@ if __name__ == '__main__':
     (X_train_without_p, xp_train, y_train,
      X_dev_without_p, xp_dev, y_dev,
      X_test_without_p, xp_test, y_test,
-     feature_names) = preprocess()
+     feature_names) = preprocess(syn=True)
 
     # Generate X sets with protected attribute
     xp_train = xp_train.reshape(-1, 1)
