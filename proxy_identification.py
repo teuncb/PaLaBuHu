@@ -21,16 +21,27 @@ def model(X_train, y_train, X_dev, y_dev, X_test, y_test, model_type="logreg"):
 
     return trained_model
 
-def get_feature_importance(model) -> np.array:
+def get_feature_importance(model, X_train, X_test) -> np.array:
     """Returns an array of values for feature importance. Does not include the protected attribute (if it was in X)"""
     # TODO update after SHAP implemented
-    pass
+    shap_values = shap_explainer(model, X_train, X_test)
+    if model == 'model_with_xp':
+        shap_values = np.delete(shap_values, 8, 1)
+    return shap_values
 
 def palabuhu_values(importance_with_xp, importance_without_xp, importance_predicting_xp) -> np.array:
     """Given the three types of feature importance, determine the "proxy-ness" of all features.
     Returns an array containing a PaLaBuHu-value for all features except xp."""
     # TODO Arbitrary placeholder, we need to check how these features look to decide on this operation
-    return abs(importance_with_xp - importance_without_xp) * importance_predicting_xp
+    ## make arrays the same length (no protected attribute)
+    plbh_values = []
+    for i in len(importance_with_xp):
+        im_w = importance_with_xp[i]
+        im_wo = importance_without_xp[i]
+        im_pred = importance_predicting_xp[i]
+        plbh = abs(im_w - im_wo) * im_pred
+        plbh_values.append(plbh)
+    return plbh_values
 
 if __name__ == '__main__':
     (X_train_without_p, xp_train, y_train,
@@ -46,16 +57,17 @@ if __name__ == '__main__':
     xp_test = xp_test.reshape(-1, 1)
     X_test_with_p = np.concatenate((X_test_without_p, xp_test), axis=1)
 
-    model_with_xp = model(X_train_with_p, y_train, X_dev_with_p, y_dev, X_test_with_p, y_test, model_type='logreg')
-    importance_with_xp = get_feature_importance(model_with_xp)
+    model_with_xp = model(X_train_with_p, y_train, X_dev_with_p, y_dev, X_test_with_p, y_test, model_type='GAM')
+    ## get predictions by testing trained model 
+    importance_with_xp = get_feature_importance(model_with_xp, X_train_with_p, X_test_with_p)
     print(f"importance_with_xp: {importance_with_xp}")
 
-    model_without_xp = model(X_train_without_p, y_train, X_dev_without_p, y_dev, X_test_without_p, y_test, model_type='logreg')
+    model_without_xp = model(X_train_without_p, y_train, X_dev_without_p, y_dev, X_test_without_p, y_test, model_type='GAM')
     importance_without_xp = get_feature_importance(model_without_xp)
     print(f"importance_without_xp: {importance_without_xp}")
 
     # Use xp as target variable
-    model_predicting_xp = model(X_train_without_p, xp_train, X_dev_without_p, xp_dev, X_test_without_p, xp_test, model_type='logreg')
+    model_predicting_xp = model(X_train_without_p, xp_train, X_dev_without_p, xp_dev, X_test_without_p, xp_test, model_type='GAM')
     importance_predicting_xp = get_feature_importance(model_predicting_xp)
     print(f"importance_predicting_xp: {importance_predicting_xp}")
 

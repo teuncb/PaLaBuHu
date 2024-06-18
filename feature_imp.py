@@ -25,7 +25,7 @@ def shap_explainer(model, X_train, X_test):
 
     # Visualize the SHAP values for a single prediction
     shap.initjs()
-    shap.force_plot(explainer.expected_value[1], shap_values[1][0], X_test.iloc[0])
+    #shap.force_plot(explainer.expected_value, shap_values[1], X_test.iloc[0])
 
     # Summary plot for feature importance
     shap.summary_plot(shap_values[1], X_test)
