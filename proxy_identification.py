@@ -47,7 +47,7 @@ if __name__ == '__main__':
     (X_train_without_p, xp_train, y_train,
      X_dev_without_p, xp_dev, y_dev,
      X_test_without_p, xp_test, y_test,
-     feature_names) = preprocess(syn=True)
+     feature_names) = preprocess(True)
 
     # Generate X sets with protected attribute
     xp_train = xp_train.reshape(-1, 1)
@@ -63,12 +63,12 @@ if __name__ == '__main__':
     print(f"importance_with_xp: {importance_with_xp}")
 
     model_without_xp = model(X_train_without_p, y_train, X_dev_without_p, y_dev, X_test_without_p, y_test, model_type='GAM')
-    importance_without_xp = get_feature_importance(model_without_xp)
+    importance_without_xp = get_feature_importance(model_without_xp, X_train_without_p, X_test_without_p)
     print(f"importance_without_xp: {importance_without_xp}")
 
     # Use xp as target variable
     model_predicting_xp = model(X_train_without_p, xp_train, X_dev_without_p, xp_dev, X_test_without_p, xp_test, model_type='GAM')
-    importance_predicting_xp = get_feature_importance(model_predicting_xp)
+    importance_predicting_xp = get_feature_importance(model_predicting_xp, X_train_without_p, X_test_without_p)
     print(f"importance_predicting_xp: {importance_predicting_xp}")
 
     proxyness_per_feature = palabuhu_values(importance_with_xp, importance_without_xp, importance_predicting_xp)
