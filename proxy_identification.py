@@ -71,5 +71,9 @@ if __name__ == '__main__':
     importance_predicting_xp = get_feature_importance(model_predicting_xp, X_train_without_p, X_test_without_p)
     print(f"importance_predicting_xp: {importance_predicting_xp}")
 
+    # load np file
+    importance_without_xp = np.load('feature_imp_without_p.npy')
+    #print(importance_without_xp[0])
+
     proxyness_per_feature = palabuhu_values(importance_with_xp, importance_without_xp, importance_predicting_xp)
     print(f"proxyness_per_feature: {proxyness_per_feature}")
