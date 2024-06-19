@@ -70,9 +70,12 @@ if __name__ == '__main__':
     model_predicting_xp = model(X_train_without_p, xp_train, X_dev_without_p, xp_dev, X_test_without_p, xp_test, model_type='GAM')
     importance_predicting_xp = get_feature_importance(model_predicting_xp, X_train_without_p, X_test_without_p)
     print(f"importance_predicting_xp: {importance_predicting_xp}")
+    np.save('feature_imp_predicting_p.npy', importance_predicting_xp)
+
+    print('woehoe gelukt!')
 
     # load np file
-    importance_without_xp = np.load('feature_imp_without_p.npy')
+    # importance_without_xp = np.load('feature_imp_without_p.npy')
     #print(importance_without_xp[0])
 
     proxyness_per_feature = palabuhu_values(importance_with_xp, importance_without_xp, importance_predicting_xp)

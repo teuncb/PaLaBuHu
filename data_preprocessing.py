@@ -52,9 +52,9 @@ def preprocess(add_synthetic_data=False):
     X_train, y_train, test_size=0.2, random_state=42)
     
     # assume same order as explained in paper, SEX is the 9th column
-    X_p_train = X_train[:,8]
-    X_p_dev = X_dev[:,8]
-    X_p_test = X_test[:,8]
+    X_p_train = X_train[:,8] - 1
+    X_p_dev = X_dev[:,8] - 1
+    X_p_test = X_test[:,8] - 1
     
     # remove protected attribute from train and test set
     X_train = np.delete(X_train,8,1)
