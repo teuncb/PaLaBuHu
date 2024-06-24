@@ -52,13 +52,11 @@ def palabuhu_values(importance_with_xp, importance_without_xp, importance_predic
     # TODO Arbitrary placeholder, we need to check how these features look to decide on this operation
     # make arrays the same length (no protected attribute)
     importance_with_xp = np.delete(importance_with_xp,8,1)
-    print(importance_with_xp[0])
     plbh_values = []
     # average over instances
     feature_avg_with_xp = np.mean(importance_with_xp,axis=0)
     feature_avg_without_xp = np.mean(importance_without_xp,axis=0)
     feature_avg_pred_xp = np.mean(importance_predicting_xp,axis=0)
-    print(len(feature_avg_with_xp))
 
     for i in range(len(feature_avg_with_xp)):
         im_w = feature_avg_with_xp[i]
@@ -70,15 +68,15 @@ def palabuhu_values(importance_with_xp, importance_without_xp, importance_predic
 
 
 def plot_palabuhu(palabuhu_values, feature_names):
-    pass
+    del feature_names[8]
     # remove protected attribute from feature_names
     plt.figure(figsize=(10, 6))
-    plt.bar(range(len(palabuhu_values)), palabuhu_values)
+    plt.bar(feature_names, palabuhu_values)
 
     # Customize the plot
     plt.title('Palabuhu feature proxyness')
     plt.xlabel('Feature')
-    plt.ylabel('Importance')
+    plt.ylabel('Palabuhu value')
 
     # Show the plot
     plt.show()
@@ -113,7 +111,7 @@ if __name__ == '__main__':
     # print(f"importance_predicting_xp: {importance_predicting_xp}")
   
 
-    print('WuHu gelukt!')
+    #print('WuHu gelukt!')
 
     # load np files
     importance_with_xp = np.load('analysis_results/feature_imp_with_p.npy')
