@@ -43,6 +43,7 @@ def preprocess(add_synthetic_data=False):
         # 95% van de mannen krijgen een promotie probability van 1, alle vrouwen krijgen een promotie prob van 0
         promo_prob[male_condition] = ones_and_zeros
         features = np.column_stack((features, promo_prob))
+        feature_names.append("PROMO")
 
     X_train, X_test, y_train, y_test = train_test_split(
     features, label, test_size=0.2, random_state=42)
