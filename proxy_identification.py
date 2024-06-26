@@ -103,10 +103,10 @@ if __name__ == '__main__':
     # print(f"importance_with_xp: {importance_with_xp}")
     # np.save('feature_imp_predicting_p.npy', importance_with_xp)
 
-    model_without_xp = model(X_train_without_p, y_train, X_dev_without_p, y_dev, X_test_without_p, y_test, model_type='GAM')
-    importance_without_xp = get_feature_importance(model_without_xp, X_train_without_p, X_test_without_p)
-    print(f"importance_without_xp: {importance_without_xp}")
-    np.save('feature_imp_without_p.npy', importance_without_xp)
+    # model_without_xp = model(X_train_without_p, y_train, X_dev_without_p, y_dev, X_test_without_p, y_test, model_type='GAM')
+    # importance_without_xp = get_feature_importance(model_without_xp, X_train_without_p, X_test_without_p)
+    # print(f"importance_without_xp: {importance_without_xp}")
+    # np.save('feature_imp_without_p.npy', importance_without_xp)
 
     # #Use xp as target variable
     # model_predicting_xp = model(X_train_without_p, xp_train, X_dev_without_p, xp_dev, X_test_without_p, xp_test, model_type='GAM')
@@ -116,13 +116,13 @@ if __name__ == '__main__':
 
     #print('WuHu gelukt!')
 
-    # load np files
-    # importance_with_xp = np.load('analysis_results/feature_imp_with_p.npy')
-    # importance_without_xp = np.load('analysis_results/feature_imp_without_p.npy')
-    # importance_predicting_xp = np.load('analysis_results/feature_imp_predicting_p.npy')
-    # #print(importance_with_xp[0])
+    #load np files
+    importance_with_xp = np.load('analysis_results/without_synthetic/feature_imp_with_p.npy')
+    importance_without_xp = np.load('analysis_results/without_synthetic/feature_imp_without_p.npy')
+    importance_predicting_xp = np.load('analysis_results/without_synthetic/feature_imp_predicting_p.npy')
+    #print(importance_with_xp[0])
 
-    # proxyness_per_feature = palabuhu_values(importance_with_xp, importance_without_xp, importance_predicting_xp)
-    # #print(f"proxyness_per_feature: {proxyness_per_feature}")
+    proxyness_per_feature = palabuhu_values(importance_with_xp, importance_without_xp, importance_predicting_xp)
+    #print(f"proxyness_per_feature: {proxyness_per_feature}")
 
-    # plot_palabuhu(proxyness_per_feature, feature_names)
+    plot_palabuhu(proxyness_per_feature, feature_names)
