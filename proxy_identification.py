@@ -85,7 +85,9 @@ if __name__ == '__main__':
     (X_train_without_p, xp_train, y_train,
      X_dev_without_p, xp_dev, y_dev,
      X_test_without_p, xp_test, y_test,
-     feature_names) = preprocess(True)
+     feature_names) = preprocess(False)
+    
+    print(len(X_train_without_p[0]))
 
     # Generate X sets with protected attribute
     xp_train = xp_train.reshape(-1, 1)
@@ -96,14 +98,15 @@ if __name__ == '__main__':
     X_test_with_p = np.concatenate((X_test_without_p, xp_test), axis=1)
 
     # model_with_xp = model(X_train_with_p, y_train, X_dev_with_p, y_dev, X_test_with_p, y_test, model_type='GAM')
-    # # get predictions by testing trained model
+    # get predictions by testing trained model
     # importance_with_xp = get_feature_importance(model_with_xp, X_train_with_p, X_test_with_p)
     # print(f"importance_with_xp: {importance_with_xp}")
-    #np.save('feature_imp_predicting_p.npy', importance_with_xp)
+    # np.save('feature_imp_predicting_p.npy', importance_with_xp)
 
-    # model_without_xp = model(X_train_without_p, y_train, X_dev_without_p, y_dev, X_test_without_p, y_test, model_type='GAM')
-    # importance_without_xp = get_feature_importance(model_without_xp, X_train_without_p, X_test_without_p)
-    # print(f"importance_without_xp: {importance_without_xp}")
+    model_without_xp = model(X_train_without_p, y_train, X_dev_without_p, y_dev, X_test_without_p, y_test, model_type='GAM')
+    importance_without_xp = get_feature_importance(model_without_xp, X_train_without_p, X_test_without_p)
+    print(f"importance_without_xp: {importance_without_xp}")
+    np.save('feature_imp_without_p.npy', importance_without_xp)
 
     # #Use xp as target variable
     # model_predicting_xp = model(X_train_without_p, xp_train, X_dev_without_p, xp_dev, X_test_without_p, xp_test, model_type='GAM')
@@ -114,12 +117,12 @@ if __name__ == '__main__':
     #print('WuHu gelukt!')
 
     # load np files
-    importance_with_xp = np.load('analysis_results/feature_imp_with_p.npy')
-    importance_without_xp = np.load('analysis_results/feature_imp_without_p.npy')
-    importance_predicting_xp = np.load('analysis_results/feature_imp_predicting_p.npy')
-    #print(importance_with_xp[0])
+    # importance_with_xp = np.load('analysis_results/feature_imp_with_p.npy')
+    # importance_without_xp = np.load('analysis_results/feature_imp_without_p.npy')
+    # importance_predicting_xp = np.load('analysis_results/feature_imp_predicting_p.npy')
+    # #print(importance_with_xp[0])
 
-    proxyness_per_feature = palabuhu_values(importance_with_xp, importance_without_xp, importance_predicting_xp)
-    #print(f"proxyness_per_feature: {proxyness_per_feature}")
+    # proxyness_per_feature = palabuhu_values(importance_with_xp, importance_without_xp, importance_predicting_xp)
+    # #print(f"proxyness_per_feature: {proxyness_per_feature}")
 
-    plot_palabuhu(proxyness_per_feature, feature_names)
+    # plot_palabuhu(proxyness_per_feature, feature_names)

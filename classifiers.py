@@ -29,21 +29,21 @@ def GAM(X_train, y_train, X_dev, y_dev):
     f(5) +       # POBP (Place of Birth) - factor term for categorical variable
     f(6) +       # RELP (Relationship) - factor term for categorical variable
     s(7) +       # WKHP (Working Hours per Week) - spline term for continuous variable
-    f(8) +       # SEX (Sex) - factor term for categorical variable
-    f(9)         # RAC1P (Race) - factor term for categorical variable))
+    #f(8) +       # SEX (Sex) - factor term for categorical variable
+    f(8)         # RAC1P (Race) - factor term for categorical variable))
     )
 
     base_gam_trained = base_gam.fit(X_train, y_train)
     base_acc = evaluate(base_gam_trained, X_dev, y_dev)
 
-    lams = np.random.rand(10, 10) # random points on [0, 1], with shape (100, 3)
+    lams = np.random.rand(10, 9) # random points on [0, 1], with shape (100, 3)
     lams = lams * 6 - 3 # shift values to -3, 3
     lams = 10 ** lams # transforms values to 1e-3, 1e3
 
     tuned_gam = base_gam.gridsearch(X_train, y_train,
-                                    lam=lams,
-                                    # n_splines=[1, 5, 20, 50, 100], # This doesn't work for unclear reasons
-                                    spline_order=range(2, 5))
+                                    lam=lams)
+                                    #, n_splines=[1, 5, 20, 50, 100] # This doesn't work for unclear reasons
+                                    #,spline_order=range(2, 5))
 
     return tuned_gam
 
