@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-import shap
+# import shap
 from scipy.stats import pearsonr
 
 def feature_correlation(X_train_with_p, X_dev_with_p, X_test_with_p):
@@ -11,7 +11,16 @@ def feature_correlation(X_train_with_p, X_dev_with_p, X_test_with_p):
 
     print(X_all[:10])
 
-    plt.matshow(correlation)
+    feature_tags = ["Age", "Class", "Education", "Married?", "Occupation",
+                    "Birth place", "Relationship", "Work hours", "Race", "Sex (xp)"]
+    feature_names = ["AGEP", "COW", "SCHL", "MAR", "OCCP", "POBP", "RELP", "WKHP", "RAC1P", "SEX"]
+
+    fig, ax = plt.subplots()
+    ax.matshow(correlation)
+    # ax.set_xticklabels(feature_names)
+    # ax.set_yticklabels(feature_names)
+    plt.xticks(range(10), feature_names, rotation=45)
+    plt.yticks(range(10), feature_names, rotation=45)
     plt.show()
 
     return correlation
