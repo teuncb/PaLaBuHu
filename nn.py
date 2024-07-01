@@ -140,39 +140,34 @@ def test_model(test_set, test_label, model, loss_fn, device):
 
 def main():
     #retrieve data
-    
-    # X_train, X_p_train, y_train, X_dev, X_p_dev, y_dev, X_test, X_p_test, y_test, _ = preprocess()  
-    # initialize(X_train, X_p_train, y_train, X_dev, X_p_dev, y_dev, X_test, X_p_test, y_test, _)
-    # # define and train model
-    # model = FFNN(
-    #     input_size=X_train.shape[1],
-    #     hidden_size=64,
-    #     num_classes=1,
-    # )
-    # optimizer = optimizer_function(model.parameters(), lr=learning_rate, weight_decay=0.01)
+    X_train, X_p_train, y_train, X_dev, X_p_dev, y_dev, X_test, X_p_test, y_test, _ = preprocess()
+    initialize(X_train, X_p_train, y_train, X_dev, X_p_dev, y_dev, X_test, X_p_test, y_test, _)
+    # define and train model
+    model = FFNN(
+        input_size=X_train.shape[1],
+        hidden_size=64,
+        num_classes=1,
+    )
+    optimizer = optimizer_function(model.parameters(), lr=learning_rate, weight_decay=0.01)
 
-    # train_model(
-    #     model,
-    #     X_train,
-    #     y_train,
-    #     loss_function,
-    #     optimizer,
-    #     num_epochs=num_epochs,
-    #     device=DEVICE,
-    # )
+    train_model(
+        model,
+        X_train,
+        y_train,
+        loss_function,
+        optimizer,
+        num_epochs=num_epochs,
+        device=DEVICE,
+    )
 
-    # # save model
-    # torch.save(model, "checkpoints/simpleNNmodel.pth")
+    # save model
+    torch.save(model, "checkpoints/simpleNNmodel.pth")
 
     # load model
     model = torch.load("checkpoints/simpleNNmodel.pth")
 
     # test model
     test_model(X_test, y_test, model, loss_function, DEVICE)
-
-    # do the same without protected attribute
-
-    # and for predicting protected attribute
 
 
 if __name__ == "__main__":

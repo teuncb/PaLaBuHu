@@ -11,14 +11,10 @@ def feature_correlation(X_train_with_p, X_dev_with_p, X_test_with_p):
 
     print(X_all[:10])
 
-    feature_tags = ["Age", "Class", "Education", "Married?", "Occupation",
-                    "Birth place", "Relationship", "Work hours", "Race", "Sex (xp)"]
     feature_names = ["AGEP", "COW", "SCHL", "MAR", "OCCP", "POBP", "RELP", "WKHP", "RAC1P", "SEX"]
 
     fig, ax = plt.subplots()
     mappable = ax.matshow(correlation)
-    # ax.set_xticklabels(feature_names)
-    # ax.set_yticklabels(feature_names)
 
     # Add a color bar (legend) with vertical orientation
     cb = plt.colorbar(mappable)
@@ -48,19 +44,6 @@ def shap_explainer(model, X_train, X_test):
     return shap_values
 
 # shap_explainer(GAM_trained, X_train, X_test)
-
-"""    # Find best parameters and model
-    grid_search = GridSearchCV(estimator=base_gam, param_grid=param_grid, scoring='accuracy', cv=3) #nog aanvullen evt
-    grid_search.fit(X_train, y_train)
-
-    best_params = grid_search.best_params_
-    best_regr = LogisticGAM(**best_params)
-
-    best_regr_trained = best_regr.fit(X_train, y_train)
-
-    # Predict again on development set and get RMSE
-    tuned_acc = evaluate(best_regr, X_dev, y_dev)
-    print(f'First Accuracy GAM: {base_acc}, Tuned Accuracy GAM: {tuned_acc}')"""
 
 if __name__ == '__main__':
     # Results to compare

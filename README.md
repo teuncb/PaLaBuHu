@@ -1,2 +1,2 @@
 # PaLaBuHu
- A measure for proxy variables in machine learning
+A novel method for determining proxy attributes, taking predictive strength into account.

@@ -13,7 +13,6 @@ def evaluate(model, x, y):
     y_pred = model.predict(x)
     return accuracy_score(y, y_pred)
 
-'''Step 1: Training and evaluating the first iteration of GAM to tune the hyperparameters'''
 def GAM(X_train, y_train, X_dev, y_dev):
     # Use linear term for continuous variables (spline terms can also be used if non-linear relationships are expected)
     # Use factor terms for categorical variables
@@ -29,7 +28,7 @@ def GAM(X_train, y_train, X_dev, y_dev):
     f(5) +       # POBP (Place of Birth) - factor term for categorical variable
     f(6) +       # RELP (Relationship) - factor term for categorical variable
     s(7) +       # WKHP (Working Hours per Week) - spline term for continuous variable
-    #f(8) +       # SEX (Sex) - factor term for categorical variable
+    f(8) +       # SEX (Sex) - factor term for categorical variable
     f(8)         # RAC1P (Race) - factor term for categorical variable))
     )
 
@@ -42,7 +41,6 @@ def GAM(X_train, y_train, X_dev, y_dev):
 
     tuned_gam = base_gam.gridsearch(X_train, y_train,
                                     lam=lams)
-                                    #, n_splines=[1, 5, 20, 50, 100] # This doesn't work for unclear reasons
                                     #,spline_order=range(2, 5))
 
     return tuned_gam
