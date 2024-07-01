@@ -16,11 +16,17 @@ def feature_correlation(X_train_with_p, X_dev_with_p, X_test_with_p):
     feature_names = ["AGEP", "COW", "SCHL", "MAR", "OCCP", "POBP", "RELP", "WKHP", "RAC1P", "SEX"]
 
     fig, ax = plt.subplots()
-    ax.matshow(correlation)
+    mappable = ax.matshow(correlation)
     # ax.set_xticklabels(feature_names)
     # ax.set_yticklabels(feature_names)
+
+    # Add a color bar (legend) with vertical orientation
+    cb = plt.colorbar(mappable)
+    cb.ax.tick_params(labelsize=14)
+
     plt.xticks(range(10), feature_names, rotation=45)
     plt.yticks(range(10), feature_names, rotation=45)
+    
     plt.show()
 
     return correlation
